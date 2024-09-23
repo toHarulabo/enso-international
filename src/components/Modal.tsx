@@ -6,14 +6,14 @@ import Confetti from 'react-confetti';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  totalLabelSum: number;  // 追加
+  totalLabelSum: number;  
+  isWinner: boolean;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, totalLabelSum }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, totalLabelSum, isWinner }) => {
   if (!isOpen) return null;
 
-  const message =
-    totalLabelSum === 27
+  const message = isWinner
       ? {
           title: "おめでとう！！いちばん早くついたよ！天才だね！",
         }

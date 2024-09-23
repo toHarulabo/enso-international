@@ -1,17 +1,22 @@
 import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
-import AirportMap from './components/AirportMap';
+import EurasiaMap from './components/Eurasia/EurasiaMap';
+import NorthAmericaMap from './components/NorthAmerica/NorthAmericaMap';
+import TopMap from './components/TopMap';
 
 function App() {
   return (
-    <div className="App">
-       <Header />
-      {/* <header className="App-header">
-        <h1>World Airports Map</h1>
-      </header> */}
-      <AirportMap />
-    </div>
+    <>
+    <Header/>
+    <Router>
+      <Routes>
+        <Route path="/" element={<TopMap />} />
+        <Route path="/eurasia" element={<EurasiaMap />} />
+      </Routes>
+    </Router>
+    </>
   );
 }
 
