@@ -2,3 +2,14 @@
   position: absolute;
   transition: transform 0.5s ease-out; /* スムーズに移動するアニメーション */
 }
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.mapContent {
+  flex-grow: 1;
+  overflow: hidden;
+}

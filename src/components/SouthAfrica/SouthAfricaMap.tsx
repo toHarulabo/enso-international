@@ -65,7 +65,7 @@ const SouthAfricaMap: React.FC = () => {
 
   const projection = safeProjection(
     geoMercator()
-      .scale(400)
+      .scale(380)
       .center([90, 35])
       .rotate([240, 0, 0])
   );
@@ -180,7 +180,7 @@ const SouthAfricaMap: React.FC = () => {
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
-          scale: 400,
+          scale: 350,
           center: [-55, 0],
           rotate: [240, 0, 0]
         }}

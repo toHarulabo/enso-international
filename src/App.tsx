@@ -11,19 +11,21 @@ import TopMap from './components/TopMap';
 
 function App() {
   return (
-    <>
-    <Header/>
-    <Router>
-      <Routes>
-        <Route path="/" element={<TopMap />} />
-        <Route path="/eurasia" element={<EurasiaMap />} />
-        <Route path="/northamerica" element={<NorthAmericaMap />} />
-        <Route path="/southamerica" element={<SouthAmericaMap />} />
-        <Route path="/southafrica" element={<SouthAfricaMap />} />
-        <Route path="/australia" element={<AustraliaMap />} />
-      </Routes>
-    </Router>
-    </>
+    <div className="appContainer">
+      <Header />
+      <div className="mapContent">
+        <Router>
+          <Routes>
+            <Route path="/" element={<TopMap />} />
+            <Route path="/eurasia" element={<EurasiaMap />} />
+            <Route path="/northamerica" element={<NorthAmericaMap />} />
+            <Route path="/southamerica" element={<SouthAmericaMap />} />
+            <Route path="/southafrica" element={<SouthAfricaMap />} />
+            <Route path="/australia" element={<AustraliaMap />} />
+          </Routes>
+        </Router>
+      </div>
+    </div>
   );
 }
 

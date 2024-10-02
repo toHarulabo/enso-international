@@ -65,7 +65,7 @@ const EurasiaMap: React.FC = () => {
 
   const projection = safeProjection(
     geoMercator()
-      .scale(500)
+      .scale(450)
       .center([80, 40])
   );
 
@@ -179,7 +179,7 @@ const EurasiaMap: React.FC = () => {
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
-          scale: 500,
+          scale: 450,
           center: [80, 40]
         }}
         style={{ width: '100%', height: '100%' }}
