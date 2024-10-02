@@ -13,6 +13,16 @@ const TopMap: React.FC = () => {
   const handleSouthAfricaClick = () => {
     navigate('/southafrica'); // /southafricaに遷移
   };
+  const handleNorthAmericaClick = () => {
+    navigate('/northamerica'); // /northamericaに遷移
+  };
+  const handleSouthAmericaClick = () => {
+    navigate('/southamerica'); // /southamericaに遷移
+  };
+  const handleAustraliaClick = () => {
+    navigate('/australia'); // /australiaに遷移
+  };
+
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
@@ -95,6 +105,69 @@ const TopMap: React.FC = () => {
           onClick={handleSouthAfricaClick} // クリックイベントを追加
         >
           南アフリカ大陸
+        </text>
+        </g>
+
+        {/* 北アメリカ大陸 */}
+        <g>
+        <rect
+          x={600} // テキストの位置に合わせて調整
+          y={155} // テキストの位置に合わせて調整
+          width={200} // 背景の幅
+          height={50} // 背景の高さ
+          fill="yellow" // 背景色を黄色に設定
+          rx={5} // 角を丸くする（オプション）
+        />
+        <text
+          x={700} // X座標
+          y={190} // Y座標
+          textAnchor="middle"
+          style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold', cursor: 'pointer' }}
+          onClick={handleNorthAmericaClick} // クリックイベントを追加
+        >
+          北アメリカ大陸
+        </text>
+        </g>
+
+        {/* 南アメリカ大陸 */}
+        <g>
+        <rect
+          x={780} // テキストの位置に合わせて調整
+          y={430} // テキストの位置に合わせて調整
+          width={200} // 背景の幅
+          height={50} // 背景の高さ
+          fill="yellow" // 背景色を黄色に設定
+          rx={5} // 角を丸くする（オプション）
+        />
+        <text
+          x={880} // X座標
+          y={465} // Y座標
+          textAnchor="middle"
+          style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold', cursor: 'pointer' }}
+          onClick={handleSouthAmericaClick} // クリックイベントを追加
+        >
+          南アメリカ大陸
+        </text>
+        </g>
+
+        {/* オーストラリア大陸 */}
+        <g>
+        <rect
+          x={180} // テキストの位置に合わせて調整
+          y={500} // テキストの位置に合わせて調整
+          width={240} // 背景の幅
+          height={50} // 背景の高さ
+          fill="yellow" // 背景色を黄色に設定
+          rx={5} // 角を丸くする（オプション）
+        />
+        <text
+          x={300} // X座標
+          y={535} // Y座標
+          textAnchor="middle"
+          style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold', cursor: 'pointer' }}
+          onClick={handleAustraliaClick} // クリックイベントを追加
+        >
+          オーストラリア大陸
         </text>
         </g>
       </ComposableMap>

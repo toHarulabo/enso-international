@@ -30,7 +30,7 @@ const safeProjection = (projection: (coords: [number, number]) => [number, numbe
   };
 };
 
-const EurasiaMap: React.FC = () => {
+const AustraliaMap: React.FC = () => {
   const [airports, setAirports] = useState<Airport[]>([]);
   const [selectedAirports, setSelectedAirports] = useState<string[]>(['HND']); // HNDを初期選択
   const [availableAirports, setAvailableAirports] = useState<string[]>([]); // クリック可能な空港
@@ -179,8 +179,8 @@ const EurasiaMap: React.FC = () => {
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
-          scale: 500,
-          center: [80, 40]
+          scale: 400,
+          center: [100, 0]
         }}
         style={{ width: '100%', height: '100%' }}
       >
@@ -216,7 +216,7 @@ const EurasiaMap: React.FC = () => {
         </Geographies>
 
         {/* 空港間の線を描画 */}
-        {renderLines()}
+        {/* {renderLines()} */}
 
         {/* 羽田空港のマーカーを表示 */}
         <HNDMarker
@@ -227,7 +227,7 @@ const EurasiaMap: React.FC = () => {
         />
 
         {/* フィルタリングされた空港の赤丸 */}
-        {filteredAirports.map((airport) => (
+        {airports.map((airport) => (
           <Marker
             key={airport.iata_code}
             coordinates={[airport.longitude, airport.latitude]}
@@ -249,19 +249,12 @@ const EurasiaMap: React.FC = () => {
         ))}
 
         {/* クリックした空港の右側に画像を表示 */}
-        <TotalLabelSum
-  totalLabelSum={totalLabelSum}
-  clickedAirportCoords={clickedAirportCoords}
-  imageSrc={currentImageSrc}
-  projection={projection}
-  textX={10}
-  textY={100}
-  rectX={0}
-  rectY={65}
-  rectWidth={210}
-  rectHeight={50}
-/>
-
+        {/* <TotalLabelSum
+          totalLabelSum={totalLabelSum}
+          clickedAirportCoords={clickedAirportCoords}
+          imageSrc={currentImageSrc}  // 動的に切り替えられる画像
+          projection={projection}  // プロジェクション関数を渡す
+        /> */}
       </ComposableMap>
 
       <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 27} />
@@ -269,4 +262,4 @@ const EurasiaMap: React.FC = () => {
   );
 };
 
-export default EurasiaMap;
+export default AustraliaMap;

@@ -252,11 +252,18 @@ const NorthAmericaMap: React.FC = () => {
 
         {/* クリックした空港の右側に画像を表示 */}
         <TotalLabelSum
-          totalLabelSum={totalLabelSum}
-          clickedAirportCoords={clickedAirportCoords}
-          imageSrc={currentImageSrc}  // 動的に切り替えられる画像
-          projection={projection}  // プロジェクション関数を渡す
-        />
+  totalLabelSum={totalLabelSum}
+  clickedAirportCoords={clickedAirportCoords}
+  imageSrc={currentImageSrc}
+  projection={projection}
+  textX={10}
+  textY={100}
+  rectX={0}
+  rectY={65}
+  rectWidth={210}
+  rectHeight={50}
+/>
+
       </ComposableMap>
 
       <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 29}/>
