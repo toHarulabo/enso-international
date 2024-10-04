@@ -8,7 +8,8 @@ import HNDMarker from '../HNDMarker';
 import Modal from '../Modal';
 import { getImageForRoute } from './getImageForRoute'; 
 //import { findShortestRoute } from './findShortestRoute';
-import enso from '../../img/enso ver3.png';  
+import enso from '../../img/enso/enso ver3.png';  
+import airportNames from './airportNames';
 
 interface Airport {
   iata_code: string;
@@ -240,10 +241,10 @@ const EurasiaMap: React.FC = () => {
             />
             <text
               textAnchor="middle"
-              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em" }}
+              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em", fontWeight: "bold" }}
               y={-5}
             >
-              {airport.iata_code}
+              {airportNames[airport.iata_code] || airport.iata_code}
             </text>
           </Marker>
         ))}

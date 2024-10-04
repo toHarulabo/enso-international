@@ -1,10 +1,10 @@
 // getImageForRoute.ts
 //経路によってensoの画像を変更させる
 
-import enso from '../../img/enso ver3.png';
-import enso_with_airplane from '../../img/enso_with_airplane_reverse ver3.png';
-import enso_with_ship from '../../img/enso_with_ship_reverse ver3.png';
-import enso_with_train from '../../img/enso_with_train_reverse ver3.png';
+import enso from '../../img/enso/enso ver3.png';
+import enso_with_airplane from '../../img/enso/enso_with_airplane_reverse ver3.png';
+import enso_with_ship from '../../img/enso/enso_with_ship_reverse ver3.png';
+import enso_with_train from '../../img/enso/enso_with_train_reverse ver3.png';
 
 /**
  * 経路に基づいて表示する画像を決定する関数

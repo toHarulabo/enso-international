@@ -1,6 +1,8 @@
 import React from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
+import Tooltip from '@mui/material/Tooltip';
 import { useNavigate } from 'react-router-dom';
+import enso from '../img/enso/enso ver3.png'; 
 
 const geoUrl = "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson";
 
@@ -8,29 +10,28 @@ const TopMap: React.FC = () => {
   const navigate = useNavigate();
 
   const handleEurasiaClick = () => {
-    navigate('/eurasia'); // /eurasiaに遷移
+    navigate('/eurasia');
   };
   const handleSouthAfricaClick = () => {
-    navigate('/southafrica'); // /southafricaに遷移
+    navigate('/southafrica');
   };
   const handleNorthAmericaClick = () => {
-    navigate('/northamerica'); // /northamericaに遷移
+    navigate('/northamerica');
   };
   const handleSouthAmericaClick = () => {
-    navigate('/southamerica'); // /southamericaに遷移
+    navigate('/southamerica');
   };
   const handleAustraliaClick = () => {
-    navigate('/australia'); // /australiaに遷移
+    navigate('/australia');
   };
-
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
-          scale: 200,
-          center: [0, 35],
+          scale: 180,
+          center: [0, 25],
           rotate: [197, 0, 0],
         }}
         style={{ width: '100%', height: '100%' }}
@@ -66,109 +67,57 @@ const TopMap: React.FC = () => {
           }
         </Geographies>
 
+        {/* enso画像に吹き出しを追加 */}
+        <foreignObject x={280} y={220} width={60} height={100}>
+          <Tooltip title="一緒に世界旅行に出かけよう！どこに行きたい？" placement="top">
+            <div style={{ display: 'inline-block', width: '100%', height: '100%' }}>
+              <img 
+                src={enso} 
+                alt="enso"
+                style={{ height: '100%', width: '100%' }}
+              />
+            </div>
+          </Tooltip>
+        </foreignObject>
+
         {/* ユーラシア大陸 */}
-        <g>
-        <rect
-          x={50} // テキストの位置に合わせて調整
-          y={115} // テキストの位置に合わせて調整
-          width={200} // 背景の幅
-          height={50} // 背景の高さ
-          fill="yellow" // 背景色を黄色に設定
-          rx={5} // 角を丸くする（オプション）
-        />
-        <text
-          x={150} // X座標
-          y={150} // Y座標
-          textAnchor="middle"
-          style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold', cursor: 'pointer' }}
-          onClick={handleEurasiaClick} // クリックイベントを追加
-        >
-          ユーラシア大陸
-        </text>
+        <g className="button" onClick={handleEurasiaClick}>
+          <rect x={70} y={115} width={200} height={50} fill="yellow" rx={5} />
+          <text x={170} y={150} textAnchor="middle" style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold' }}>
+            ユーラシア大陸
+          </text>
         </g>
 
         {/* 南アフリカ大陸 */}
-        <g>
-        <rect
-          x={-220} // テキストの位置に合わせて調整
-          y={345} // テキストの位置に合わせて調整
-          width={200} // 背景の幅
-          height={50} // 背景の高さ
-          fill="yellow" // 背景色を黄色に設定
-          rx={5} // 角を丸くする（オプション）
-        />
-        <text
-          x={-120} // X座標
-          y={380} // Y座標
-          textAnchor="middle"
-          style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold', cursor: 'pointer' }}
-          onClick={handleSouthAfricaClick} // クリックイベントを追加
-        >
-          南アフリカ大陸
-        </text>
+        <g className="button" onClick={handleSouthAfricaClick}>
+          <rect x={-160} y={325} width={200} height={50} fill="yellow" rx={5} />
+          <text x={-60} y={360} textAnchor="middle" style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold' }}>
+            南アフリカ大陸
+          </text>
         </g>
 
         {/* 北アメリカ大陸 */}
-        <g>
-        <rect
-          x={600} // テキストの位置に合わせて調整
-          y={155} // テキストの位置に合わせて調整
-          width={200} // 背景の幅
-          height={50} // 背景の高さ
-          fill="yellow" // 背景色を黄色に設定
-          rx={5} // 角を丸くする（オプション）
-        />
-        <text
-          x={700} // X座標
-          y={190} // Y座標
-          textAnchor="middle"
-          style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold', cursor: 'pointer' }}
-          onClick={handleNorthAmericaClick} // クリックイベントを追加
-        >
-          北アメリカ大陸
-        </text>
+        <g className="button" onClick={handleNorthAmericaClick}>
+          <rect x={600} y={155} width={200} height={50} fill="yellow" rx={5} />
+          <text x={700} y={190} textAnchor="middle" style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold' }}>
+            北アメリカ大陸
+          </text>
         </g>
 
         {/* 南アメリカ大陸 */}
-        <g>
-        <rect
-          x={780} // テキストの位置に合わせて調整
-          y={430} // テキストの位置に合わせて調整
-          width={200} // 背景の幅
-          height={50} // 背景の高さ
-          fill="yellow" // 背景色を黄色に設定
-          rx={5} // 角を丸くする（オプション）
-        />
-        <text
-          x={880} // X座標
-          y={465} // Y座標
-          textAnchor="middle"
-          style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold', cursor: 'pointer' }}
-          onClick={handleSouthAmericaClick} // クリックイベントを追加
-        >
-          南アメリカ大陸
-        </text>
+        <g className="button" onClick={handleSouthAmericaClick}>
+          <rect x={740} y={400} width={200} height={50} fill="yellow" rx={10} />
+          <text x={840} y={435} textAnchor="middle" style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold' }}>
+            南アメリカ大陸
+          </text>
         </g>
 
         {/* オーストラリア大陸 */}
-        <g>
-        <rect
-          x={180} // テキストの位置に合わせて調整
-          y={500} // テキストの位置に合わせて調整
-          width={240} // 背景の幅
-          height={50} // 背景の高さ
-          fill="yellow" // 背景色を黄色に設定
-          rx={5} // 角を丸くする（オプション）
-        />
-        <text
-          x={300} // X座標
-          y={535} // Y座標
-          textAnchor="middle"
-          style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold', cursor: 'pointer' }}
-          onClick={handleAustraliaClick} // クリックイベントを追加
-        >
-          オーストラリア大陸
-        </text>
+        <g className="button" onClick={handleAustraliaClick}>
+          <rect x={180} y={440} width={240} height={50} fill="yellow" rx={5} />
+          <text x={300} y={475} textAnchor="middle" style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold' }}>
+            オーストラリア大陸
+          </text>
         </g>
       </ComposableMap>
     </div>

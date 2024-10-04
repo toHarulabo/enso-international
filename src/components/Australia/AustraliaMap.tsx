@@ -8,7 +8,7 @@ import HNDMarker from '../HNDMarker';
 import Modal from '../Modal';
 import { getImageForRoute } from './getImageForRoute'; 
 //import { findShortestRoute } from './findShortestRoute';
-import enso from '../../img/enso ver3.png';  
+import enso from '../../img/enso/enso ver3.png';  
 
 interface Airport {
   iata_code: string;

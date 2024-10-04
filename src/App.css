@@ -13,3 +13,14 @@
   flex-grow: 1;
   overflow: hidden;
 }
+
+.button rect, .button text {
+  transition: transform 0.2s ease-in-out, fill 0.2s ease-in-out; /* 通常時にもtransitionを適用 */
+  cursor: pointer;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25)); /* 影 */
+}
+
+.button:hover rect, .button:hover text {
+  fill: gold; /* ホバー時に背景色（または文字色）を変更 */
+  transform: translateY(-5px); /* ホバー時にY軸方向に移動 */
+}
