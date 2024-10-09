@@ -66,7 +66,7 @@ const NorthAmericaMap: React.FC = () => {
   const projection = safeProjection(
     geoMercator()
       .scale(400)
-      .center([90, 35])
+      .center([90, 31])
       .rotate([240, 0, 0])
   );
 
@@ -181,7 +181,7 @@ const NorthAmericaMap: React.FC = () => {
         projection="geoMercator"
         projectionConfig={{
           scale: 400,
-          center: [90, 35],
+          center: [90, 31],
           rotate: [240, 0, 0]
         }}
         style={{ width: '100%', height: '100%' }}
@@ -236,7 +236,15 @@ const NorthAmericaMap: React.FC = () => {
           >
             <circle
               r={8}
-              fill={selectedAirports.includes(airport.iata_code) ? "#0000FF" : "#FF0000"} // 選択されたら青、されてなければ赤
+              fill={
+                airport.iata_code === 'AFN' 
+                ? selectedAirports.includes(airport.iata_code) 
+                  ? "#0000FF"  // ADOが選択されたら青色
+                  : "#FFA500"  // ADOが未選択ならオレンジ色
+                : selectedAirports.includes(airport.iata_code) 
+                ? "#0000FF"  // 他の空港が選択されたら青色
+                : "#FF0000"  // 他の空港が未選択なら赤色
+              }
               onClick={() => handleMarkerClick(airport.iata_code, airport.longitude, airport.latitude)} // クリックイベントを追加
               style={{ cursor: availableAirports.includes(airport.iata_code) ? "pointer" : "not-allowed" }} // クリック可能かどうか
             />
@@ -257,13 +265,12 @@ const NorthAmericaMap: React.FC = () => {
   imageSrc={currentImageSrc}
   projection={projection}
   textX={10}
-  textY={100}
-  rectX={0}
-  rectY={65}
-  rectWidth={210}
+  textY={80}
+  rectX={5}
+  rectY={45}
+  rectWidth={180}
   rectHeight={50}
 />
-
       </ComposableMap>
 
       <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 29}/>

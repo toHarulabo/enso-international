@@ -9,6 +9,8 @@ import Modal from '../Modal';
 import { getImageForRoute } from './getImageForRoute'; 
 //import { findShortestRoute } from './findShortestRoute';
 import enso from '../../img/enso/enso ver3.png';  
+import airportNames from './airportNames';
+
 
 interface Airport {
   iata_code: string;
@@ -54,7 +56,7 @@ const AustraliaMap: React.FC = () => {
         setAirports(response.data.data); // データを状態に保存
 
         // 初期状態でHNDと接続されている空港をavailableAirportsに追加
-        setAvailableAirports(['ADH', 'ABA', 'AAT', 'ACZ']);
+        setAvailableAirports(['ACZ', 'ABU', 'AEA']);
       } catch (error) {
         console.error('Error fetching airport data:', error);
       }
@@ -65,18 +67,16 @@ const AustraliaMap: React.FC = () => {
 
   const projection = safeProjection(
     geoMercator()
-      .scale(500)
-      .center([80, 40])
+      .scale(400)
+      .center([100, 0])
   );
 
   // 空港間の接続を定義（赤線で繋がる空港ペアとラベル）
   const connections = [
-    ['HND', 'ADH', '6'], ['HND', 'ABA', '8'], ['HND', 'AAT', '8'], ['HND', 'ACZ', '12'],
-    ['ADH', 'ACS', '12'], ['ADH', 'ABA', '15'],
-    ['ABA', 'AAT', '6'], ['ABA', 'AFS', '15'], ['ABA', 'ACH', '28'],
-    ['ACS', 'ACH', '24'], ['AAT', 'AFS', '14'], ['AAT', 'ACZ', '5'],
-    ['AFS', 'ACZ', '7'], ['AFS', 'ACH', '8'], ['ACZ', 'ADB', '16'], ['ACZ', 'AAC', '12'],
-    ['AAC', 'ADB', '5'], ['ADB', 'ACH', '5']
+    ['HND', 'ACZ', '4'], ['HND', 'ABU', '8'], ['HND', 'AEA', '3'], ['ACZ', 'ACJ', '2'],
+    ['ACZ', 'ABU', '9'], 
+    ['ABU', 'ADO', '3'], ['ACJ', 'ADO', '9'],
+    ['AEA', 'ABU', '5'], ['AEA', 'ADO', '9'], 
   ];
 
   const hndAirport: Airport = {
@@ -89,7 +89,7 @@ const AustraliaMap: React.FC = () => {
 
   // フィルタリングされた空港のリストを取得
   const filteredAirports = airports.filter(airport =>
-    ['ADH', 'ABA', 'AAT', 'ACZ', 'ACS', 'AFS', 'AAC', 'ADB', 'ACH'].includes(airport.iata_code)
+    ['ACZ', 'ABU', 'AEA', 'ACJ', 'ADO'].includes(airport.iata_code)
   );
 
   // 空港をクリックした際の処理
@@ -130,7 +130,7 @@ const AustraliaMap: React.FC = () => {
       setAvailableAirports(nextAirports); // 次のクリック可能な空港に設定
 
       // ゴールの ACH に到達した場合、ゲーム終了
-      if (iataCode === 'ACH') {
+      if (iataCode === 'ADO') {
         setGoal(true);
         setIsModalOpen(true); 
       }
@@ -141,7 +141,7 @@ const AustraliaMap: React.FC = () => {
    const handleReset = () => {
     setSelectedAirports(['HND']); // 初期状態に戻す（HNDのみ選択）
     setSelectedConnections([]);   // 選択された接続をリセット
-    setAvailableAirports(['ADH', 'ABA', 'AAT', 'ACZ']); // 初期状態に戻す
+    setAvailableAirports(['ACZ', 'ABU', 'AEA']); // 初期状態に戻す
     setTotalLabelSum(0);  // 総ラベルをリセット
     setGoal(false);  // ゲーム終了フラグをリセット
     setIsModalOpen(false);  // モーダルを閉じる
@@ -216,7 +216,7 @@ const AustraliaMap: React.FC = () => {
         </Geographies>
 
         {/* 空港間の線を描画 */}
-        {/* {renderLines()} */}
+        {renderLines()}
 
         {/* 羽田空港のマーカーを表示 */}
         <HNDMarker
@@ -227,37 +227,51 @@ const AustraliaMap: React.FC = () => {
         />
 
         {/* フィルタリングされた空港の赤丸 */}
-        {airports.map((airport) => (
+        {filteredAirports.map((airport) => (
           <Marker
             key={airport.iata_code}
             coordinates={[airport.longitude, airport.latitude]}
           >
             <circle
               r={8}
-              fill={selectedAirports.includes(airport.iata_code) ? "#0000FF" : "#FF0000"} // 選択されたら青、されてなければ赤
+              fill={
+                airport.iata_code === 'ADO' 
+                ? selectedAirports.includes(airport.iata_code) 
+                  ? "#0000FF"  // ADOが選択されたら青色
+                  : "#FFA500"  // ADOが未選択ならオレンジ色
+                : selectedAirports.includes(airport.iata_code) 
+                ? "#0000FF"  // 他の空港が選択されたら青色
+                : "#FF0000"  // 他の空港が未選択なら赤色
+              }
               onClick={() => handleMarkerClick(airport.iata_code, airport.longitude, airport.latitude)} // クリックイベントを追加
               style={{ cursor: availableAirports.includes(airport.iata_code) ? "pointer" : "not-allowed" }} // クリック可能かどうか
             />
             <text
               textAnchor="middle"
-              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em" }}
-              y={-5}
+              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em", fontWeight: "bold" }}
+              y={-10}
             >
-              {airport.iata_code}
+              {airportNames[airport.iata_code] || airport.iata_code}
             </text>
           </Marker>
         ))}
 
         {/* クリックした空港の右側に画像を表示 */}
-        {/* <TotalLabelSum
-          totalLabelSum={totalLabelSum}
-          clickedAirportCoords={clickedAirportCoords}
-          imageSrc={currentImageSrc}  // 動的に切り替えられる画像
-          projection={projection}  // プロジェクション関数を渡す
-        /> */}
+        <TotalLabelSum
+  totalLabelSum={totalLabelSum}
+  clickedAirportCoords={clickedAirportCoords}
+  imageSrc={currentImageSrc}
+  projection={projection}
+  textX={100}
+  textY={400}
+  rectX={80}
+  rectY={365}
+  rectWidth={210}
+  rectHeight={50}
+/>
       </ComposableMap>
 
-      <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 27} />
+      <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 11} />
     </div>
   );
 };

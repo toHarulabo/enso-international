@@ -235,14 +235,22 @@ const EurasiaMap: React.FC = () => {
           >
             <circle
               r={8}
-              fill={selectedAirports.includes(airport.iata_code) ? "#0000FF" : "#FF0000"} // 選択されたら青、されてなければ赤
+              fill={
+                airport.iata_code === 'ACH' 
+                ? selectedAirports.includes(airport.iata_code) 
+                  ? "#0000FF"  // ADOが選択されたら青色
+                  : "#FFA500"  // ADOが未選択ならオレンジ色
+                : selectedAirports.includes(airport.iata_code) 
+                ? "#0000FF"  // 他の空港が選択されたら青色
+                : "#FF0000"  // 他の空港が未選択なら赤色
+              }
               onClick={() => handleMarkerClick(airport.iata_code, airport.longitude, airport.latitude)} // クリックイベントを追加
               style={{ cursor: availableAirports.includes(airport.iata_code) ? "pointer" : "not-allowed" }} // クリック可能かどうか
             />
             <text
               textAnchor="middle"
               style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em", fontWeight: "bold" }}
-              y={-5}
+              y={-10}
             >
               {airportNames[airport.iata_code] || airport.iata_code}
             </text>
