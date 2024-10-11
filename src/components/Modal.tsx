@@ -24,7 +24,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, totalLabelSum, isWinner 
   return (
     <div style={modalOverlayStyle}>
       <div style={modalContentStyle}>
-        {totalLabelSum === 27 && <Confetti />}
+        {isWinner && <Confetti />}
         <h2 style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fontWeight: "bold" }}>
           {message.title}
         </h2>

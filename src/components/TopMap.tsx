@@ -111,6 +111,7 @@ const TopMap: React.FC = () => {
         </g>
 
         {/* 南アメリカ大陸 */}
+        <image href={star} x={740} y={355} width={50} height={50} />
         <g className="button" onClick={handleSouthAmericaClick}>
           <rect x={740} y={400} width={200} height={50} fill="yellow" rx={10} />
           <text x={840} y={435} textAnchor="middle" style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold' }}>

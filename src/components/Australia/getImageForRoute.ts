@@ -11,24 +11,23 @@ import enso_with_ship from '../../img/enso/enso_with_ship ver3.png';
 export const getImageForRoute = (lastSelectedAirport: string, iataCode: string): string => {
   // 飛行機経路の場合
   if (
-    (lastSelectedAirport === 'HND' && iataCode === 'ACZ') || 
-    (lastSelectedAirport === 'HND' && iataCode === 'ABU') || 
-    (lastSelectedAirport === 'HND' && iataCode === 'AEA') ||
-    (lastSelectedAirport === 'ACZ' && iataCode === 'ACJ') ||
-    (lastSelectedAirport === 'ACZ' && iataCode === 'ABU') ||
-    (lastSelectedAirport === 'ABU' && iataCode === 'ACZ') ||
-    (lastSelectedAirport === 'ABU' && iataCode === 'AEA') ||
-    (lastSelectedAirport === 'ABU' && iataCode === 'ADO') ||
-    (lastSelectedAirport === 'ACJ' && iataCode === 'ADO') ||
-    (lastSelectedAirport === 'AEA' && iataCode === 'ABU')
+    (lastSelectedAirport === 'HND' && iataCode === 'ABX') || 
+    (lastSelectedAirport === 'HND' && iataCode === 'ACN') ||
+    (lastSelectedAirport === 'ACN' && iataCode === 'AEP') 
   ) {
     return enso_with_airplane; // 飛行機経路の場合
   }
 
   // 船の経路の場合
   else if (
-    (lastSelectedAirport === 'HND' && iataCode === 'ABU') || // HNDからABUへは船で移動
-    (lastSelectedAirport === 'AEA' && iataCode === 'ADO')   // AEAからADOへは船で移動
+    (lastSelectedAirport === 'HND' && iataCode === 'AAA') || 
+    (lastSelectedAirport === 'HND' && iataCode === 'ACN') ||
+    (lastSelectedAirport === 'ABX' && iataCode === 'AAA') ||
+    (lastSelectedAirport === 'ABX' && iataCode === 'AEP') ||
+    (lastSelectedAirport === 'AAA' && iataCode === 'ABX') ||
+    (lastSelectedAirport === 'AAA' && iataCode === 'ACN') ||
+    (lastSelectedAirport === 'AAA' && iataCode === 'AEP') ||
+    (lastSelectedAirport === 'ACN' && iataCode === 'AAA')
   ) {
     return enso_with_ship; // 船の経路の場合
   }

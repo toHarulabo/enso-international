@@ -6,9 +6,10 @@ import LineWithMidpoint from '../LineWithMidpoint';
 import TotalLabelSum from '../TotalLabelSum';  
 import HNDMarker from '../HNDMarker';
 import Modal from '../Modal';
-import { getImageForRoute } from '../NorthAmerica/getImageForRoute'; 
+import { getImageForRoute } from '../SouthAfrica/getImageForRoute'; 
 //import { findShortestRoute } from './findShortestRoute';
 import enso from '../../img/enso/enso ver3.png';  
+import airportNames from './airportNames';
 
 interface Airport {
   iata_code: string;
@@ -54,7 +55,7 @@ const SouthAfricaMap: React.FC = () => {
         setAirports(response.data.data); // データを状態に保存
 
         // 初期状態でHNDと接続されている空港をavailableAirportsに追加
-        setAvailableAirports(['ADK', 'ACV', 'AEA']);
+        setAvailableAirports(['ABM', 'ABU', 'AEG', 'ACJ', 'ACZ']);
       } catch (error) {
         console.error('Error fetching airport data:', error);
       }
@@ -65,19 +66,18 @@ const SouthAfricaMap: React.FC = () => {
 
   const projection = safeProjection(
     geoMercator()
-      .scale(380)
-      .center([90, 35])
+      .scale(350)
+      .center([-55, -4])
       .rotate([240, 0, 0])
   );
 
   // 空港間の接続を定義（赤線で繋がる空港ペアとラベル）
   const connections = [
-    ['HND', 'ADK', '14'], ['HND', 'ACV', '21'], ['HND', 'AEA', '16'], ['ADK', 'ADQ', '8'],
-    ['AEA', 'ABQ', '8'], ['AEA', 'ACA', '22'],
-    ['ADQ', 'ACV', '12'], ['ADQ', 'AFO', '5'], ['ADQ', 'AEL', '6'],
-    ['ADQ', 'AFN', '8'], ['ACV', 'AFO', '7'], ['ACV', 'ABQ', '8'],
-    ['ABQ', 'AFO', '7'], ['ABQ', 'AEL', '9'], ['ABQ', 'ADR', '3'], ['ABQ', 'ACA', '12'],
-    ['ACA', 'ADR', '4'], ['AFO', 'AEL', '9'], ['AEL', 'AFN', '8'], ['AEL', 'ADR', '8'], ['ADR', 'AFN', '2']
+    ['HND', 'ABM', '6'], ['HND', 'ABU', '6'], ['HND', 'AEG', '6'], ['HND', 'ACJ', '7'],
+    ['HND', 'ACZ', '12'], ['ACZ', 'AAE', '7'], ['ACZ', 'ABK', '5'], ['ABM', 'ABU', '12'],  
+    ['ABU', 'AEG', '6'], ['AEG', 'ACJ', '12'], ['ACJ', 'ABK', '8'], ['ABK', 'AAE', '25'],  
+    ['ABM', 'AFD', '40'], ['ABU', 'AFD', '35'], ['AEG', 'AFD', '30'], ['ACJ', 'AFD', '30'],
+    ['ABK', 'AFD', '25'], ['AAE', 'AFD', '35'] 
   ];
 
   const hndAirport: Airport = {
@@ -90,7 +90,7 @@ const SouthAfricaMap: React.FC = () => {
 
   // フィルタリングされた空港のリストを取得
   const filteredAirports = airports.filter(airport =>
-    ['ADK', 'AEA', 'ADQ', 'ACV', 'ABQ', 'AFO', 'ACA', 'AEL', 'ADR', 'AFN'].includes(airport.iata_code)
+    ['ACZ', 'AAE', 'ABM', 'ABU', 'AEG', 'ACJ', 'ABK', 'AFD'].includes(airport.iata_code)
   );
 
   // 空港をクリックした際の処理
@@ -130,8 +130,8 @@ const SouthAfricaMap: React.FC = () => {
 
       setAvailableAirports(nextAirports); // 次のクリック可能な空港に設定
 
-      // ゴールの AFN に到達した場合、ゲーム終了
-      if (iataCode === 'AFN') {
+      // ゴールの AFD に到達した場合、ゲーム終了
+      if (iataCode === 'AFD') {
         setGoal(true);
         setIsModalOpen(true); 
       }
@@ -142,7 +142,7 @@ const SouthAfricaMap: React.FC = () => {
    const handleReset = () => {
     setSelectedAirports(['HND']); // 初期状態に戻す（HNDのみ選択）
     setSelectedConnections([]);   // 選択された接続をリセット
-    setAvailableAirports(['ADK', 'ACV', 'AEA']); // 初期状態に戻す
+    setAvailableAirports(['ABM', 'ABU', 'AEG', 'ACJ', 'ACZ']); // 初期状態に戻す
     setTotalLabelSum(0);  // 総ラベルをリセット
     setGoal(false);  // ゲーム終了フラグをリセット
     setIsModalOpen(false);  // モーダルを閉じる
@@ -181,7 +181,7 @@ const SouthAfricaMap: React.FC = () => {
         projection="geoMercator"
         projectionConfig={{
           scale: 350,
-          center: [-55, 0],
+          center: [-55, -4],
           rotate: [240, 0, 0]
         }}
         style={{ width: '100%', height: '100%' }}
@@ -218,7 +218,7 @@ const SouthAfricaMap: React.FC = () => {
         </Geographies>
 
         {/* 空港間の線を描画 */}
-        {/* {renderLines()} */}
+        {renderLines()}
 
         {/* 羽田空港のマーカーを表示 */}
         <HNDMarker
@@ -229,23 +229,31 @@ const SouthAfricaMap: React.FC = () => {
         />
 
         {/* フィルタリングされた空港の赤丸 */}
-        {airports.map((airport) => (
+        {filteredAirports.map((airport) => (
           <Marker
             key={airport.iata_code}
             coordinates={[airport.longitude, airport.latitude]}
           >
             <circle
               r={8}
-              fill={selectedAirports.includes(airport.iata_code) ? "#0000FF" : "#FF0000"} // 選択されたら青、されてなければ赤
+              fill={
+                airport.iata_code === 'AFD' 
+                ? selectedAirports.includes(airport.iata_code) 
+                  ? "#0000FF"  // AFDが選択されたら青色
+                  : "#FFA500"  // AFDが未選択ならオレンジ色
+                : selectedAirports.includes(airport.iata_code) 
+                ? "#0000FF"  // 他の空港が選択されたら青色
+                : "#FF0000"  // 他の空港が未選択なら赤色
+              }
               onClick={() => handleMarkerClick(airport.iata_code, airport.longitude, airport.latitude)} // クリックイベントを追加
               style={{ cursor: availableAirports.includes(airport.iata_code) ? "pointer" : "not-allowed" }} // クリック可能かどうか
             />
             <text
               textAnchor="middle"
-              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em" }}
-              y={-5}
+              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em", fontWeight: "bold" }}
+              y={-10}
             >
-              {airport.iata_code}
+              {airportNames[airport.iata_code] || airport.iata_code}
             </text>
           </Marker>
         ))}
@@ -257,16 +265,16 @@ const SouthAfricaMap: React.FC = () => {
   imageSrc={currentImageSrc}
   projection={projection}
   textX={450}
-  textY={450}
+  textY={130}
   rectX={430}
-  rectY={410}
+  rectY={90}
   rectWidth={210}
   rectHeight={60}
 />
 
       </ComposableMap>
 
-      <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 29}/>
+      <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 36}/>
     </div>
   );
 };
