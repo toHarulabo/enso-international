@@ -10,30 +10,30 @@ import enso_with_ship from '../../img/enso/enso_with_ship ver3.png';
  */
 export const getImageForRoute = (lastSelectedAirport: string, iataCode: string): string => {
   // 飛行機経路の場合
-  if (
-    (lastSelectedAirport === 'HND' && iataCode === 'ABX') || 
-    (lastSelectedAirport === 'HND' && iataCode === 'ACN') ||
-    (lastSelectedAirport === 'ACN' && iataCode === 'AEP') 
-  ) {
-    return enso_with_airplane; // 飛行機経路の場合
+  const airplaneRoutes = [
+    ['HND', 'ACZ'], ['HND', 'AEA'], 
+    ['ACZ', 'ACJ'], ['ACZ', 'ABU'], 
+    ['ABU', 'ACZ'], ['ABU', 'AEA'], 
+    ['ABU', 'ADO'], ['ACJ', 'ADO'], 
+    ['AEA', 'ABU']
+  ];
+
+  // 船の経路の場合
+  const shipRoutes = [
+    ['HND', 'ABU'], 
+    ['AEA', 'ADO']
+  ];
+
+  // 飛行機経路の場合
+  if (airplaneRoutes.some(route => (route[0] === lastSelectedAirport && route[1] === iataCode) || (route[0] === iataCode && route[1] === lastSelectedAirport))) {
+    return enso_with_airplane;
   }
 
   // 船の経路の場合
-  else if (
-    (lastSelectedAirport === 'HND' && iataCode === 'AAA') || 
-    (lastSelectedAirport === 'HND' && iataCode === 'ACN') ||
-    (lastSelectedAirport === 'ABX' && iataCode === 'AAA') ||
-    (lastSelectedAirport === 'ABX' && iataCode === 'AEP') ||
-    (lastSelectedAirport === 'AAA' && iataCode === 'ABX') ||
-    (lastSelectedAirport === 'AAA' && iataCode === 'ACN') ||
-    (lastSelectedAirport === 'AAA' && iataCode === 'AEP') ||
-    (lastSelectedAirport === 'ACN' && iataCode === 'AAA')
-  ) {
-    return enso_with_ship; // 船の経路の場合
+  if (shipRoutes.some(route => (route[0] === lastSelectedAirport && route[1] === iataCode) || (route[0] === iataCode && route[1] === lastSelectedAirport))) {
+    return enso_with_ship;
   }
 
   // その他の場合、デフォルトのenso
-  else {
-    return enso;
-  }
+  return enso;
 };

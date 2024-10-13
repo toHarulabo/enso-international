@@ -10,6 +10,7 @@ import { getImageForRoute } from '../SouthAmerica/getImageForRoute';
 //import { findShortestRoute } from './findShortestRoute';
 import enso from '../../img/enso/enso ver3.png';  
 import airportNames from './airportNames';
+import MovingImage from '../MovingImage';
 
 interface Airport {
   iata_code: string;
@@ -44,10 +45,11 @@ const SouthAfricaMap: React.FC = () => {
 
   useEffect(() => {
     const fetchAirports = async () => {
+      // https://aviationstack.com/ を使用して空港APIを取得
       try {
-        const response = await axios.get('http://api.aviationstack.com/v1/airports', {
+        const response = await axios.get('https://api.aviationstack.com/v1/airports', {
           params: {
-            access_key: 'd4c2df5baa3fff5746d798f6577a67bf',
+            access_key: 'd4c2df5baa3fff5746d798f6577a67bf', //API KEY　ここを変える
           }
         });
 
@@ -260,7 +262,6 @@ const SouthAfricaMap: React.FC = () => {
         <TotalLabelSum
   totalLabelSum={totalLabelSum}
   clickedAirportCoords={clickedAirportCoords}
-  imageSrc={currentImageSrc}
   projection={projection}
   textX={450}
   textY={80}
@@ -269,6 +270,12 @@ const SouthAfricaMap: React.FC = () => {
   rectWidth={210}
   rectHeight={60}
 />
+
+  <MovingImage 
+        imageSrc={currentImageSrc} 
+        clickedAirportCoords={clickedAirportCoords} 
+        projection={projection} 
+      />
       </ComposableMap>
 
       <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 27}/>

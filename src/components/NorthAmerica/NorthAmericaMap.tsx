@@ -9,6 +9,8 @@ import Modal from '../Modal';
 import { getImageForRoute } from '../NorthAmerica/getImageForRoute'; 
 //import { findShortestRoute } from './findShortestRoute';
 import enso from '../../img/enso/enso ver3.png';  
+import airportNames from './airportNames';
+import MovingImage from '../MovingImage';
 
 interface Airport {
   iata_code: string;
@@ -43,10 +45,11 @@ const NorthAmericaMap: React.FC = () => {
 
   useEffect(() => {
     const fetchAirports = async () => {
+      // https://aviationstack.com/ を使用して空港APIを取得
       try {
-        const response = await axios.get('http://api.aviationstack.com/v1/airports', {
+        const response = await axios.get('https://api.aviationstack.com/v1/airports', {
           params: {
-            access_key: 'd4c2df5baa3fff5746d798f6577a67bf',
+            access_key: 'd4c2df5baa3fff5746d798f6577a67bf', //API KEY　ここを変える
           }
         });
 
@@ -253,7 +256,7 @@ const NorthAmericaMap: React.FC = () => {
               style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em" }}
               y={-5}
             >
-              {airport.iata_code}
+              {airportNames[airport.iata_code] || airport.iata_code}
             </text>
           </Marker>
         ))}
@@ -262,7 +265,6 @@ const NorthAmericaMap: React.FC = () => {
         <TotalLabelSum
   totalLabelSum={totalLabelSum}
   clickedAirportCoords={clickedAirportCoords}
-  imageSrc={currentImageSrc}
   projection={projection}
   textX={10}
   textY={80}
@@ -271,6 +273,12 @@ const NorthAmericaMap: React.FC = () => {
   rectWidth={180}
   rectHeight={50}
 />
+
+<MovingImage 
+        imageSrc={currentImageSrc} 
+        clickedAirportCoords={clickedAirportCoords} 
+        projection={projection} 
+      />
       </ComposableMap>
 
       <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 29}/>
