@@ -93,6 +93,7 @@ const TopMap: React.FC = () => {
         </g>
 
         {/* 南アフリカ大陸 */}
+        <image href={star} x={-160} y={280} width={50} height={50} />
         <g className="button" onClick={handleSouthAfricaClick}>
           <rect x={-160} y={325} width={200} height={50} fill="yellow" rx={5} />
           <text x={-60} y={360} textAnchor="middle" style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', fill: '#000000', fontWeight: 'bold' }}>

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { geoMercator } from 'd3-geo';
-import LineWithMidpoint from '../LineWithMidpoint';
-import TotalLabelSum from '../TotalLabelSum';  
+import LineWithMidpoint from '../LineWithMidpoint'; 
 import HNDMarker from '../HNDMarker';
 import Modal from '../Modal';
 import { getImageForRoute } from './getImageForRoute'; 
@@ -20,6 +19,10 @@ interface Airport {
   longitude: number;
 }
 
+interface EurasiaMapProps {
+  setTotalLabelSum: (sum: number) => void; // 親から受け取る関数
+}
+
 const geoUrl = "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson";
 
 const safeProjection = (projection: (coords: [number, number]) => [number, number] | null) => {
@@ -32,13 +35,13 @@ const safeProjection = (projection: (coords: [number, number]) => [number, numbe
   };
 };
 
-const EurasiaMap: React.FC = () => {
+const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
   const [airports, setAirports] = useState<Airport[]>([]);
   const [selectedAirports, setSelectedAirports] = useState<string[]>(['HND']); // HNDを初期選択
   const [availableAirports, setAvailableAirports] = useState<string[]>([]); // クリック可能な空港
   const [selectedConnections, setSelectedConnections] = useState<{from: string, to: string, label: string}[]>([]); // 選択された接続を保存
   const [Goal, setGoal] = useState<boolean>(false); // ゲーム終了フラグ
-  const [totalLabelSum, setTotalLabelSum] = useState<number>(0); // 総ラベルの合計
+  const [totalLocalLabelSum, setTotalLocalLabelSum] = useState<number>(0); // ローカルの総ラベルの合計
   const [clickedAirportCoords, setClickedAirportCoords] = useState<[number, number] | null>(null); // 最後にクリックされた空港の座標
   const [currentImageSrc, setCurrentImageSrc] = useState<string>(enso); // 現在表示している画像の状態
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -112,7 +115,11 @@ const EurasiaMap: React.FC = () => {
         setSelectedConnections((prev) => [...prev, {from: lastSelectedAirport, to: iataCode, label: connection[2]}]);
 
         // ラベルの合計を計算
-        setTotalLabelSum(prev => prev + Number(connection[2]));
+        setTotalLocalLabelSum(prev => {  
+          const newSum = prev + Number(connection[2]);
+          setTotalLabelSum(newSum); // 親コンポーネントに更新を通知
+          return newSum;
+        });
 
         // クリックした空港の座標を保存し、ピクセル座標に変換
         const pixelCoords = projection([longitude, latitude]);
@@ -149,6 +156,7 @@ const EurasiaMap: React.FC = () => {
     setGoal(false);  // ゲーム終了フラグをリセット
     setIsModalOpen(false);  // モーダルを閉じる
     setCurrentImageSrc(enso); // 画像を初期状態に戻す
+    setTotalLabelSum(0); // リセット時に親にも通知
   };
 
   // 空港ペアの描画
@@ -259,19 +267,7 @@ const EurasiaMap: React.FC = () => {
           </Marker>
         ))}
 
-        {/* クリックした空港の右側に画像を表示 */}
-        <TotalLabelSum
-  totalLabelSum={totalLabelSum}
-  clickedAirportCoords={clickedAirportCoords}
-  projection={projection}
-  textX={10}
-  textY={100}
-  rectX={0}
-  rectY={65}
-  rectWidth={210}
-  rectHeight={50}
-/>
-
+{/* ensoの移動 */}
 <MovingImage 
         imageSrc={currentImageSrc} 
         clickedAirportCoords={clickedAirportCoords} 
@@ -280,7 +276,7 @@ const EurasiaMap: React.FC = () => {
 
       </ComposableMap>
 
-      <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 27} />
+      <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLocalLabelSum} isWinner={totalLocalLabelSum === 27} />
     </div>
   );
 };

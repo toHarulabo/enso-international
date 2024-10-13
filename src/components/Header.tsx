@@ -10,10 +10,11 @@ import India from '../img/Countries/India.png';
 import Germany from '../img/Countries/Germany.png'; 
 
 interface HeaderProps {
+  totalLabelSum: number; // totalLabelSumを受け取る
   onReset?: () => void;  // リセット用の関数をプロパティとして受け取る
 }
 
-const Header: React.FC<HeaderProps> = ({ onReset }) => { 
+const Header: React.FC<HeaderProps> = ({ totalLabelSum, onReset }) => { 
   const location = useLocation(); // 現在のルートパスを取得
   const navigate = useNavigate(); // ルートを遷移させるためのフック
 
@@ -51,8 +52,11 @@ const Header: React.FC<HeaderProps> = ({ onReset }) => {
           </button>
         </div>
       )}
-      <div className={`py-4 ${isDefaultRoute ? 'flex justify-center items-center w-full' : ''}`}>
-        {isDefaultRoute && ( // デフォルトルートの時に画像を表示
+      <div className="flex flex-grow justify-center items-center relative">
+        <p className="text-4xl font-bold absolute">
+          {getTitle()}
+        </p>
+        {isDefaultRoute && ( // デフォルトルートの時に国旗を表示
           <div className="flex justify-between items-center w-full">
             {/* 左側の4つの国旗 */}
             <div className="flex space-x-6">
@@ -60,10 +64,6 @@ const Header: React.FC<HeaderProps> = ({ onReset }) => {
               <img src={Japan} alt="Japan" className="h-10 w-15 border border-black"/>
               <img src={Egypt} alt="Egypt" className="h-10 w-15" />
               <img src={India} alt="India" className="h-10 w-15" />
-            </div>
-            {/* 中央のテキスト */}
-            <div className="text-4xl h-full flex items-center mx-4">
-              <p className="font-bold">{getTitle()}</p>
             </div>
             {/* 右側の4つの国旗 */}
             <div className="flex space-x-6">
@@ -74,10 +74,14 @@ const Header: React.FC<HeaderProps> = ({ onReset }) => {
             </div>
           </div>
         )}
-        {!isDefaultRoute && ( // デフォルトルート以外ではタイトルだけを表示
-          <div className="text-4xl h-full flex items-center mx-auto">
-            <p className="font-bold">{getTitle()}</p>
-          </div>
+        {!isDefaultRoute && ( // デフォルトルート以外では総時間を右側に表示
+          <p className="py-2 px-4 bg-yellow-300 ml-4 text-2xl rounded absolute right-20">
+            総時間: 
+            <span className="font-bold px-1 text-4xl">
+              {totalLabelSum}
+            </span>
+            時間
+          </p>
         )}
       </div>
       {showButtons && ( // ホーム画面以外の場合にボタンを表示

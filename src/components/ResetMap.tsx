@@ -12,31 +12,33 @@ interface MapContainerProps {
 
 const ResetMap: React.FC<MapContainerProps> = ({ continent }) => {
   const [resetKey, setResetKey] = useState<number>(0);  // リセット用のキー
+  const [totalLabelSum, setTotalLabelSum] = useState<number>(0);  // totalLabelSumを管理
 
   const handleReset = () => {
-    // リセットするためにキーを更新
     setResetKey(prevKey => prevKey + 1);
+    setTotalLabelSum(0); // リセット時にtotalLabelSumもリセット
   };
 
-  // 大陸に応じたマップコンポーネントを返す
   const renderMap = () => {
     switch (continent) {
       case 'Eurasia':
-        return <EurasiaMap key={resetKey} />;
+        return <EurasiaMap key={resetKey} setTotalLabelSum={setTotalLabelSum} />;
       case 'NorthAmerica':
-        return <NorthAmericaMap key={resetKey} />;
+        return <NorthAmericaMap key={resetKey} setTotalLabelSum={setTotalLabelSum} />;
       case 'SouthAmerica':
-        return <SouthAmericaMap key={resetKey} />;
+        return <SouthAmericaMap key={resetKey} setTotalLabelSum={setTotalLabelSum} />;
       case 'Australia':
-        return <AustraliaMap key={resetKey} />;
+        return <AustraliaMap key={resetKey} setTotalLabelSum={setTotalLabelSum} />;
       case 'SouthAfrica':
-        return <SouthAfricaMap key={resetKey} />;
+        return <SouthAfricaMap key={resetKey} setTotalLabelSum={setTotalLabelSum} />;
+      default:
+        return null;
     }
   };
 
   return (
     <div>
-      <Header onReset={handleReset} />  {/* Headerにリセット関数を渡す */}
+      <Header totalLabelSum={totalLabelSum} onReset={handleReset} />  {/* HeaderにtotalLabelSumとリセット関数を渡す */}
       {renderMap()}  {/* 大陸に応じたマップを表示 */}
     </div>
   );

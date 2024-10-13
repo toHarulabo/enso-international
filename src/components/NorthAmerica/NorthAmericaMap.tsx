@@ -3,7 +3,6 @@ import axios from 'axios';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { geoMercator } from 'd3-geo';
 import LineWithMidpoint from '../LineWithMidpoint';
-import TotalLabelSum from '../TotalLabelSum';  
 import HNDMarker from '../HNDMarker';
 import Modal from '../Modal';
 import { getImageForRoute } from '../NorthAmerica/getImageForRoute'; 
@@ -20,6 +19,10 @@ interface Airport {
   longitude: number;
 }
 
+interface NorthAmericaMapProps {
+  setTotalLabelSum: (sum: number) => void; // 親から受け取る関数
+}
+
 const geoUrl = "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson";
 
 const safeProjection = (projection: (coords: [number, number]) => [number, number] | null) => {
@@ -32,13 +35,13 @@ const safeProjection = (projection: (coords: [number, number]) => [number, numbe
   };
 };
 
-const NorthAmericaMap: React.FC = () => {
+const NorthAmericaMap: React.FC<NorthAmericaMapProps> = ({ setTotalLabelSum }) => {
   const [airports, setAirports] = useState<Airport[]>([]);
   const [selectedAirports, setSelectedAirports] = useState<string[]>(['HND']); // HNDを初期選択
   const [availableAirports, setAvailableAirports] = useState<string[]>([]); // クリック可能な空港
   const [selectedConnections, setSelectedConnections] = useState<{from: string, to: string, label: string}[]>([]); // 選択された接続を保存
   const [Goal, setGoal] = useState<boolean>(false); // ゲーム終了フラグ
-  const [totalLabelSum, setTotalLabelSum] = useState<number>(0); // 総ラベルの合計
+  const [totalLocalLabelSum, setTotalLocalLabelSum] = useState<number>(0); // ローカルの総ラベルの合計
   const [clickedAirportCoords, setClickedAirportCoords] = useState<[number, number] | null>(null); // 最後にクリックされた空港の座標
   const [currentImageSrc, setCurrentImageSrc] = useState<string>(enso); // 現在表示している画像の状態
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -112,8 +115,12 @@ const NorthAmericaMap: React.FC = () => {
         // 接続を保存（from, to, label）
         setSelectedConnections((prev) => [...prev, {from: lastSelectedAirport, to: iataCode, label: connection[2]}]);
 
-        // ラベルの合計を計算
-        setTotalLabelSum(prev => prev + Number(connection[2]));
+                // ラベルの合計を計算
+                setTotalLocalLabelSum(prev => {  
+                  const newSum = prev + Number(connection[2]);
+                  setTotalLabelSum(newSum); // 親コンポーネントに更新を通知
+                  return newSum;
+                });
 
         // クリックした空港の座標を保存し、ピクセル座標に変換
         const pixelCoords = projection([longitude, latitude]);
@@ -150,6 +157,7 @@ const NorthAmericaMap: React.FC = () => {
     setGoal(false);  // ゲーム終了フラグをリセット
     setIsModalOpen(false);  // モーダルを閉じる
     setCurrentImageSrc(enso); // 画像を初期状態に戻す
+    setTotalLabelSum(0); // リセット時に親にも通知
   };
 
   // 空港ペアの描画
@@ -242,8 +250,8 @@ const NorthAmericaMap: React.FC = () => {
               fill={
                 airport.iata_code === 'AFN' 
                 ? selectedAirports.includes(airport.iata_code) 
-                  ? "#0000FF"  // ADOが選択されたら青色
-                  : "#FFA500"  // ADOが未選択ならオレンジ色
+                  ? "#0000FF"  // AFNが選択されたら青色
+                  : "#FFA500"  // AFNが未選択ならオレンジ色
                 : selectedAirports.includes(airport.iata_code) 
                 ? "#0000FF"  // 他の空港が選択されたら青色
                 : "#FF0000"  // 他の空港が未選択なら赤色
@@ -253,35 +261,24 @@ const NorthAmericaMap: React.FC = () => {
             />
             <text
               textAnchor="middle"
-              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em" }}
-              y={-5}
+              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em", fontWeight: "bold" }}
+              y={-10}
             >
               {airportNames[airport.iata_code] || airport.iata_code}
             </text>
           </Marker>
         ))}
 
-        {/* クリックした空港の右側に画像を表示 */}
-        <TotalLabelSum
-  totalLabelSum={totalLabelSum}
-  clickedAirportCoords={clickedAirportCoords}
-  projection={projection}
-  textX={10}
-  textY={80}
-  rectX={5}
-  rectY={45}
-  rectWidth={180}
-  rectHeight={50}
-/>
-
+{/* ensoの移動 */}
 <MovingImage 
         imageSrc={currentImageSrc} 
         clickedAirportCoords={clickedAirportCoords} 
         projection={projection} 
       />
+      
       </ComposableMap>
 
-      <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLabelSum} isWinner={totalLabelSum === 29}/>
+      <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLocalLabelSum} isWinner={totalLocalLabelSum === 29}/>
     </div>
   );
 };
