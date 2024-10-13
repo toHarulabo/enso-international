@@ -45,7 +45,7 @@ const SouthAfricaMap: React.FC = () => {
   useEffect(() => {
     const fetchAirports = async () => {
       try {
-        const response = await axios.get('http://api.aviationstack.com/v1/airports', {
+        const response = await axios.get('https://api.aviationstack.com/v1/airports', {
           params: {
             access_key: 'd4c2df5baa3fff5746d798f6577a67bf',
           }
