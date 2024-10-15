@@ -21,7 +21,7 @@ const HNDMarker: React.FC<HNDMarkerProps> = ({ longitude, latitude, selectedAirp
       />
       <text
         textAnchor="middle"
-        style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em", fontWeight: "bold" }}
+        style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "0.8em", fontWeight: "bold" }}
         y={-10}
       >
         羽田空港

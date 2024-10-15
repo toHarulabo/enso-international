@@ -9,7 +9,7 @@ const airportNames: Record<string, string> = {
   ACA: 'アカプルコ国際空港',
   AEL: 'アルバート・リー市営空港',
   ADR: 'ロバート・F・スウィニー空港',
-  AFN: 'ジャフリー空港（シルバーランチ）',
+  AFN: 'ジャフリー空港',
 };
 
 export default airportNames;

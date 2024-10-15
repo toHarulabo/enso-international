@@ -4,7 +4,6 @@ import './App.css';
 import Header from './components/Header';
 import ResetMap from './components/ResetMap';
 import TopMap from './components/TopMap';
-import SouthAfricaMap from './components/SouthAfrica/SouthAfricaMap'; // SouthAfricaMapをインポート
 
 function App() {
   const [totalLabelSum, setTotalLabelSum] = useState<number>(0); // 親コンポーネントで管理
@@ -32,7 +31,7 @@ function App() {
             />
             <Route 
               path="/southafrica" 
-              element={<><Header totalLabelSum={totalLabelSum}/><SouthAfricaMap setTotalLabelSum={setTotalLabelSum} /></>} 
+              element={<ResetMap continent="SouthAfrica" />} 
             />
             <Route 
               path="/australia" 

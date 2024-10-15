@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { geoMercator } from 'd3-geo';
-import LineWithMidpoint from '../LineWithMidpoint';
+import LineComponent from '../LineComponent'; 
+import LabelComponent from '../LabelComponent';
 import HNDMarker from '../HNDMarker';
 import Modal from '../Modal';
 import { getImageForRoute } from '../SouthAfrica/getImageForRoute'; 
@@ -73,6 +74,16 @@ const SouthAfricaMap: React.FC<SouthAfricaMapProps> = ({ setTotalLabelSum }) => 
       .center([-55, -4])
       .rotate([240, 0, 0])
   );
+
+  const getAdjustedCoords = (
+    coords: [number, number],
+    projection: (coords: [number, number]) => [number, number],
+    xOffset: number = -80,
+    yOffset: number = 50
+  ) => {
+    const [x, y] = projection(coords);
+    return [x + xOffset, y + yOffset];
+  };
 
     // 空港間の接続を定義（赤線で繋がる空港ペアとラベル）
   const connections = [
@@ -154,27 +165,54 @@ const SouthAfricaMap: React.FC<SouthAfricaMapProps> = ({ setTotalLabelSum }) => 
     setGoal(false);  // ゲーム終了フラグをリセット
     setIsModalOpen(false);  // モーダルを閉じる
     setCurrentImageSrc(enso); // 画像を初期状態に戻す
+    setTotalLocalLabelSum(0); // リセット時に親にも通知
   };
 
-   // 空港ペアの描画
   const renderLines = () => {
+    return connections.map(([a1, a2], index) => {
+      const airport1 = a1 === 'HND' ? hndAirport : airports.find(airport => airport.iata_code === a1);
+      const airport2 = a2 === 'HND' ? hndAirport : airports.find(airport => airport.iata_code === a2);
+      if (airport1 && airport2) {
+         // この接続が選択されているかどうかを判定
+         const isSelectedConnection = selectedConnections.some(
+          connection => (connection.from === a1 && connection.to === a2) || (connection.from === a2 && connection.to === a1)
+        );
+        const [x1, y1] = getAdjustedCoords([airport1.longitude, airport1.latitude], projection);
+        const [x2, y2] = getAdjustedCoords([airport2.longitude, airport2.latitude], projection);
+        
+        return (
+          <LineComponent
+            key={`line-${index}`}
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            color={isSelectedConnection ? "#0000FF" : "#FF0000"} // 選択されたら青色、それ以外は赤色
+            strokeDasharray={isSelectedConnection ? "0" : "4 2"} // 選択されたら実線、それ以外は点線
+          />
+        );
+      }
+      return null;
+    });
+  };
+  
+  const renderLabels = () => {
     return connections.map(([a1, a2, label], index) => {
       const airport1 = a1 === 'HND' ? hndAirport : airports.find(airport => airport.iata_code === a1);
       const airport2 = a2 === 'HND' ? hndAirport : airports.find(airport => airport.iata_code === a2);
       if (airport1 && airport2) {
-        // この接続が選択されているかどうかを判定
-        const isSelectedConnection = selectedConnections.some(
-          connection => (connection.from === a1 && connection.to === a2) || (connection.from === a2 && connection.to === a1)
-        );
+        const [x1, y1] = getAdjustedCoords([airport1.longitude, airport1.latitude], projection);
+        const [x2, y2] = getAdjustedCoords([airport2.longitude, airport2.latitude], projection);
+        const [mx, my] = [(x1 + x2) / 2, (y1 + y2) / 2];
+  
         return (
-          <LineWithMidpoint
-            key={index}
-            airport1={airport1}
-            airport2={airport2}
-            projection={projection}
-            label={label} // 接続に応じたラベルを渡す
-            color={isSelectedConnection ? "#0000FF" : "#FF0000"} // 選択されたら青色、それ以外は赤色
-            strokeDasharray={isSelectedConnection ? "0" : "4 2"} // 選択されたら実線、それ以外は点線
+          <LabelComponent
+            key={`label-${index}`}
+            x={mx}
+            y={my}
+            label={label}
+            labelColor="#0000FF" // customize as needed
+            labelSize="1.5em"
           />
         );
       }
@@ -257,13 +295,16 @@ const SouthAfricaMap: React.FC<SouthAfricaMapProps> = ({ setTotalLabelSum }) => 
             />
             <text
               textAnchor="middle"
-              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "1em", fontWeight: "bold" }}
+              style={{ fontFamily: "system-ui", fill: "#000000", fontSize: "0.8em", fontWeight: "bold" }}
               y={-10}
             >
               {airportNames[airport.iata_code] || airport.iata_code}
             </text>
           </Marker>
         ))}
+
+        {/* ラベルを描画 */}
+{renderLabels()}
 
         {/* ensoの移動*/}
         <MovingImage 
