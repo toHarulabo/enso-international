@@ -30,8 +30,8 @@ function App() {
               element={<ResetMap continent="SouthAmerica" />} 
             />
             <Route 
-              path="/southafrica" 
-              element={<ResetMap continent="SouthAfrica" />} 
+              path="/africa" 
+              element={<ResetMap continent="Africa" />} 
             />
             <Route 
               path="/australia" 

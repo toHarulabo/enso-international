@@ -4,7 +4,7 @@ import EurasiaMap from './Eurasia/EurasiaMap';  // 各大陸のマップコン�
 import NorthAmericaMap from './NorthAmerica/NorthAmericaMap';
 import SouthAmericaMap from './SouthAmerica/SouthAmericaMap';
 import AustraliaMap from './Australia/AustraliaMap';
-import SouthAfricaMap from './SouthAfrica/SouthAfricaMap';
+import AfricaMap from './Africa/AfricaMap';
 
 interface MapContainerProps {
   continent: string; // どの大陸を表示するかを指定
@@ -29,8 +29,8 @@ const ResetMap: React.FC<MapContainerProps> = ({ continent }) => {
         return <SouthAmericaMap key={resetKey} setTotalLabelSum={setTotalLabelSum} />;
       case 'Australia':
         return <AustraliaMap key={resetKey} setTotalLabelSum={setTotalLabelSum} />;
-      case 'SouthAfrica':
-        return <SouthAfricaMap key={resetKey} setTotalLabelSum={setTotalLabelSum} />;
+      case 'Africa':
+        return <AfricaMap key={resetKey} setTotalLabelSum={setTotalLabelSum} />;
       default:
         return null;
     }

@@ -6,7 +6,7 @@ import LineComponent from '../LineComponent';
 import LabelComponent from '../LabelComponent';
 import HNDMarker from '../HNDMarker';
 import Modal from '../Modal';
-import { getImageForRoute } from '../SouthAfrica/getImageForRoute'; 
+import { getImageForRoute } from './getImageForRoute'; 
 import enso from '../../img/enso/enso ver3.png';  
 import airportNames from './airportNames';
 import MovingImage from '../MovingImage';
@@ -19,7 +19,7 @@ interface Airport {
   longitude: number;
 }
 
-interface SouthAfricaMapProps {
+interface AfricaMapProps {
   setTotalLabelSum: (sum: number) => void; // 親から受け取る関数
 }
 
@@ -35,7 +35,7 @@ const safeProjection = (projection: (coords: [number, number]) => [number, numbe
   };
 };
 
-const SouthAfricaMap: React.FC<SouthAfricaMapProps> = ({ setTotalLabelSum }) => {
+const AfricaMap: React.FC<AfricaMapProps> = ({ setTotalLabelSum }) => {
   const [airports, setAirports] = useState<Airport[]>([]);
   const [selectedAirports, setSelectedAirports] = useState<string[]>(['HND']); // HNDを初期選択
   const [availableAirports, setAvailableAirports] = useState<string[]>([]); // クリック可能な空港
@@ -319,4 +319,4 @@ const SouthAfricaMap: React.FC<SouthAfricaMapProps> = ({ setTotalLabelSum }) => 
   );
 };
 
-export default SouthAfricaMap;
+export default AfricaMap;

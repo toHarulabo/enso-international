@@ -27,8 +27,8 @@ const Header: React.FC<HeaderProps> = ({ totalLabelSum, onReset }) => {
         return '～北アメリカ大陸編～';
       case '/southamerica':
         return '～南アメリカ大陸編～';
-      case '/southafrica':
-        return '～南アフリカ大陸編～';
+      case '/africa':
+        return '～アフリカ大陸編～';
       case '/australia':
         return '～オーストラリア大陸編～';
       default:
