@@ -16,6 +16,12 @@
 * getImageForRoute.ts : 経路によって表示するえんそ君の画像を変更させるために使用。(電車、飛行機、船に乗っているえんそ君を表示)  
 
 
+## ブランチ
+* master : デフォルトブランチ。
+* notuseAPI : 空港情報のAPIを使用していないバージョン。masterと中身同じ。
+* useAPI : 空港情報のAPIを使用しているバージョン。
+
+
 ## アプリのリンクの作成
 Vercelを使ってアプリのリンクを作成している。(https://ensokun.vercel.app/)
 
