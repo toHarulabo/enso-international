@@ -1,10 +1,10 @@
-# 使い方
+## 使い方
 1. Reactのインストール
 
 2. npm startでブラウザの立ち上げ [http://localhost:3000]
 
 
-# コードの説明
+## コードの説明
 最初の画面は '/src/App.tsx' で表示される。  
 ヘッダーは '/src/components/Header.tsx' , 最初のマップ画面は '/src/components/TopMap.tsx' に記述している。  
 
@@ -16,7 +16,7 @@
 * getImageForRoute.ts : 経路によって表示するえんそ君の画像を変更させるために使用。(電車、飛行機、船に乗っているえんそ君を表示)  
 
 
-# Vercel
+## アプリのリンクの作成
 Vercelを使ってアプリのリンクを作成している。(https://ensokun.vercel.app/)
 
 
