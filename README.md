@@ -23,7 +23,8 @@
 
 
 ## アプリのリンクの作成
-Vercelを使ってアプリのリンクを作成している。(https://ensokun.vercel.app/)
+Vercelを使ってアプリのリンクを作成できる。(https://vercel.com/)  
+(https://ensokun.vercel.app/)
 
 
 ## Learn More
