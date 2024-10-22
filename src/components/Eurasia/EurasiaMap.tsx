@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { geoMercator } from 'd3-geo';
 import LineComponent from '../LineComponent'; 
@@ -7,7 +6,6 @@ import LabelComponent from '../LabelComponent';
 import HNDMarker from '../HNDMarker';
 import Modal from '../Modal';
 import { getImageForRoute } from './getImageForRoute'; 
-//import { findShortestRoute } from './findShortestRoute';
 import enso from '../../img/enso/enso ver3.png';  
 import airportNames from './airportNames';
 import MovingImage from '../MovingImage';
@@ -24,6 +22,73 @@ interface EurasiaMapProps {
   setTotalLabelSum: (sum: number) => void; // 親から受け取る関数
 }
 
+// 空港データをハードコードで指定
+const airports: Airport[] = [
+  {
+    iata_code: 'ADH',
+    airport_name: 'Aldan Airport',
+    country_name: 'Russia',
+    latitude: 58.6027,
+    longitude: 125.4089
+  },
+  {
+    iata_code: 'ACS',
+    airport_name: 'Achinsk Airport',
+    country_name: 'Russia',
+    latitude: 56.2682,
+    longitude: 90.5708
+  },
+  {
+    iata_code: 'ABA',
+    airport_name: 'Abakan Airport',
+    country_name: 'Russia',
+    latitude: 53.7400,
+    longitude: 91.3850
+  },
+  {
+    iata_code: 'AAT',
+    airport_name: 'Altay Air Base',
+    country_name: 'China',
+    latitude: 47.7498,
+    longitude: 88.0858
+  },
+  {
+    iata_code: 'AFS',
+    airport_name: 'Zarafshan-Sugraly Airport',
+    country_name: 'Uzbekistan',
+    latitude: 41.6138,
+    longitude: 64.2332
+  },
+  {
+    iata_code: 'ACZ',
+    airport_name: 'Zabol Airport',
+    country_name: 'Iran',
+    latitude: 31.0983,
+    longitude: 61.5438
+  },
+  {
+    iata_code: 'AAC',
+    airport_name: 'El Arish International Airport',
+    country_name: 'Egypt',
+    latitude: 31.0732,
+    longitude: 33.8358
+  },
+  {
+    iata_code: 'ADB',
+    airport_name: 'Adnan Menderes International Airport',
+    country_name: 'Turkey',
+    latitude: 38.2924,
+    longitude: 27.1569
+  },
+  {
+    iata_code: 'ACH',
+    airport_name: 'St Gallen Altenrhein Airport',
+    country_name: 'Switzerland',
+    latitude: 47.4850,
+    longitude: 9.5607
+  }
+];
+
 const geoUrl = "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson";
 
 const safeProjection = (projection: (coords: [number, number]) => [number, number] | null) => {
@@ -37,38 +102,14 @@ const safeProjection = (projection: (coords: [number, number]) => [number, numbe
 };
 
 const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
-  const [airports, setAirports] = useState<Airport[]>([]);
   const [selectedAirports, setSelectedAirports] = useState<string[]>(['HND']); // HNDを初期選択
-  const [availableAirports, setAvailableAirports] = useState<string[]>([]); // クリック可能な空港
+  const [availableAirports, setAvailableAirports] = useState<string[]>(['ADH', 'ABA', 'AAT', 'ACZ']); // クリック可能な空港
   const [selectedConnections, setSelectedConnections] = useState<{from: string, to: string, label: string}[]>([]); // 選択された接続を保存
   const [Goal, setGoal] = useState<boolean>(false); // ゲーム終了フラグ
   const [totalLocalLabelSum, setTotalLocalLabelSum] = useState<number>(0); // ローカルの総ラベルの合計
   const [clickedAirportCoords, setClickedAirportCoords] = useState<[number, number] | null>(null); // 最後にクリックされた空港の座標
   const [currentImageSrc, setCurrentImageSrc] = useState<string>(enso); // 現在表示している画像の状態
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    const fetchAirports = async () => {
-      // https://aviationstack.com/ を使用して空港APIを取得
-      try {
-        const response = await axios.get('https://api.aviationstack.com/v1/airports', {
-          params: {
-            access_key: 'd4c2df5baa3fff5746d798f6577a67bf', //API KEY　ここを変える
-          }
-        });
-
-        console.log(response.data.data); // デバッグのため、取得したデータをコンソールに表示
-        setAirports(response.data.data); // データを状態に保存
-
-        // 初期状態でHNDと接続されている空港をavailableAirportsに追加
-        setAvailableAirports(['ADH', 'ABA', 'AAT', 'ACZ']);
-      } catch (error) {
-        console.error('Error fetching airport data:', error);
-      }
-    };
-
-    fetchAirports();
-  }, []);
 
   const projection = safeProjection(
     geoMercator()
@@ -104,53 +145,39 @@ const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
     longitude: 139.6917
   };
 
-  // フィルタリングされた空港のリストを取得
-  const filteredAirports = airports.filter(airport =>
-    ['ADH', 'ABA', 'AAT', 'ACZ', 'ACS', 'AFS', 'AAC', 'ADB', 'ACH'].includes(airport.iata_code)
-  );
-
   // 空港をクリックした際の処理
   const handleMarkerClick = (iataCode: string, longitude: number, latitude: number) => {
     if (availableAirports.includes(iataCode) && !Goal) {
-      // 空港を選択済みに追加
       setSelectedAirports((prev) => [...prev, iataCode]);
 
-      // 最後に選択された空港
       const lastSelectedAirport = selectedAirports[selectedAirports.length - 1];
 
-      // 接続情報を取得
       const connection = connections.find(([a1, a2]) => (a1 === lastSelectedAirport && a2 === iataCode) || (a1 === iataCode && a2 === lastSelectedAirport));
 
       if (connection) {
-        // 接続を保存（from, to, label）
         setSelectedConnections((prev) => [...prev, {from: lastSelectedAirport, to: iataCode, label: connection[2]}]);
 
-        // ラベルの合計を計算
         setTotalLocalLabelSum(prev => {  
           const newSum = prev + Number(connection[2]);
           setTotalLabelSum(newSum); // 親コンポーネントに更新を通知
           return newSum;
         });
 
-        // クリックした空港の座標を保存し、ピクセル座標に変換
         const pixelCoords = projection([longitude, latitude]);
         if (pixelCoords) {
           setClickedAirportCoords(pixelCoords);
         }
 
-         // 経路に基づいて画像を切り替える(getImageForRoute.tsで指定)
-         setCurrentImageSrc(getImageForRoute(lastSelectedAirport, iataCode));
-        }
+        setCurrentImageSrc(getImageForRoute(lastSelectedAirport, iataCode));
+      }
 
-      // 新たにクリック可能な空港を計算
       const nextAirports = connections
-        .filter(([a1, a2]) => a1 === iataCode || a2 === iataCode) // クリックされた空港と繋がる空港を探す
-        .map(([a1, a2]) => (a1 === iataCode ? a2 : a1)) // 繋がる空港をリストアップ
-        .filter((airport) => !selectedAirports.includes(airport)); // 未選択の空港のみ追加
+        .filter(([a1, a2]) => a1 === iataCode || a2 === iataCode)
+        .map(([a1, a2]) => (a1 === iataCode ? a2 : a1))
+        .filter((airport) => !selectedAirports.includes(airport));
 
-      setAvailableAirports(nextAirports); // 次のクリック可能な空港に設定
+      setAvailableAirports(nextAirports);
 
-      // ゴールの ACH に到達した場合、ゲーム終了
       if (iataCode === 'ACH') {
         setGoal(true);
         setIsModalOpen(true); 
@@ -158,16 +185,15 @@ const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
     }
   };
 
-   // リセット処理を定義
-   const handleReset = () => {
-    setSelectedAirports(['HND']); // 初期状態に戻す（HNDのみ選択）
-    setSelectedConnections([]);   // 選択された接続をリセット
-    setAvailableAirports(['ADH', 'ABA', 'AAT', 'ACZ']); // 初期状態に戻す
-    setTotalLabelSum(0);  // 総ラベルをリセット
-    setGoal(false);  // ゲーム終了フラグをリセット
-    setIsModalOpen(false);  // モーダルを閉じる
-    setCurrentImageSrc(enso); // 画像を初期状態に戻す
-    setTotalLocalLabelSum(0); // リセット時に親にも通知
+  const handleReset = () => {
+    setSelectedAirports(['HND']);
+    setSelectedConnections([]);
+    setAvailableAirports(['ADH', 'ABA', 'AAT', 'ACZ']);
+    setTotalLabelSum(0);
+    setGoal(false);
+    setIsModalOpen(false);
+    setCurrentImageSrc(enso);
+    setTotalLocalLabelSum(0);
   };
 
   const renderLines = () => {
@@ -175,10 +201,9 @@ const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
       const airport1 = a1 === 'HND' ? hndAirport : airports.find(airport => airport.iata_code === a1);
       const airport2 = a2 === 'HND' ? hndAirport : airports.find(airport => airport.iata_code === a2);
       if (airport1 && airport2) {
-                // この接続が選択されているかどうかを判定
-                const isSelectedConnection = selectedConnections.some(
-                  connection => (connection.from === a1 && connection.to === a2) || (connection.from === a2 && connection.to === a1)
-                );
+        const isSelectedConnection = selectedConnections.some(
+          connection => (connection.from === a1 && connection.to === a2) || (connection.from === a2 && connection.to === a1)
+        );
         const [x1, y1] = getAdjustedCoords([airport1.longitude, airport1.latitude], projection);
         const [x2, y2] = getAdjustedCoords([airport2.longitude, airport2.latitude], projection);
         
@@ -189,8 +214,8 @@ const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
             y1={y1}
             x2={x2}
             y2={y2}
-            color={isSelectedConnection ? "#0000FF" : "#FF0000"} // 選択されたら青色、それ以外は赤色
-            strokeDasharray={isSelectedConnection ? "0" : "4 2"} // 選択されたら実線、それ以外は点線
+            color={isSelectedConnection ? "#0000FF" : "#FF0000"}
+            strokeDasharray={isSelectedConnection ? "0" : "4 2"}
           />
         );
       }
@@ -213,7 +238,7 @@ const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
             x={mx}
             y={my}
             label={label}
-            labelColor="#0000FF" // customize as needed
+            labelColor="#0000FF"
             labelSize="1.5em"
           />
         );
@@ -263,10 +288,8 @@ const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
           }
         </Geographies>
 
-        {/* 空港間の線を描画 */}
         {renderLines()}
 
-        {/* 羽田空港のマーカーを表示 */}
         <HNDMarker
           longitude={hndAirport.longitude}
           latitude={hndAirport.latitude}
@@ -274,8 +297,7 @@ const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
           handleMarkerClick={() => handleMarkerClick(hndAirport.iata_code, hndAirport.longitude, hndAirport.latitude)}
         />
 
-        {/* フィルタリングされた空港の赤丸 */}
-        {filteredAirports.map((airport) => (
+        {airports.map((airport) => (
           <Marker
             key={airport.iata_code}
             coordinates={[airport.longitude, airport.latitude]}
@@ -285,14 +307,14 @@ const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
               fill={
                 airport.iata_code === 'ACH' 
                 ? selectedAirports.includes(airport.iata_code) 
-                  ? "#0000FF"  // ADOが選択されたら青色
-                  : "#FFA500"  // ADOが未選択ならオレンジ色
+                  ? "#0000FF"
+                  : "#FFA500"
                 : selectedAirports.includes(airport.iata_code) 
-                ? "#0000FF"  // 他の空港が選択されたら青色
-                : "#FF0000"  // 他の空港が未選択なら赤色
+                ? "#0000FF"
+                : "#FF0000"
               }
-              onClick={() => handleMarkerClick(airport.iata_code, airport.longitude, airport.latitude)} // クリックイベントを追加
-              style={{ cursor: availableAirports.includes(airport.iata_code) ? "pointer" : "not-allowed" }} // クリック可能かどうか
+              onClick={() => handleMarkerClick(airport.iata_code, airport.longitude, airport.latitude)}
+              style={{ cursor: availableAirports.includes(airport.iata_code) ? "pointer" : "not-allowed" }}
             />
             <text
               textAnchor="middle"
@@ -304,16 +326,13 @@ const EurasiaMap: React.FC<EurasiaMapProps> = ({ setTotalLabelSum }) => {
           </Marker>
         ))}
 
-                {/* ラベルを描画 */}
-                {renderLabels()}
+        {renderLabels()}
 
-{/* ensoの移動 */}
-<MovingImage 
-        imageSrc={currentImageSrc} 
-        clickedAirportCoords={clickedAirportCoords} 
-        projection={projection} 
-      />
-
+        <MovingImage 
+          imageSrc={currentImageSrc} 
+          clickedAirportCoords={clickedAirportCoords} 
+          projection={projection} 
+        />
       </ComposableMap>
 
       <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLocalLabelSum} isWinner={totalLocalLabelSum === 27} />

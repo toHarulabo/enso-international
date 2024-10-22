@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { geoMercator } from 'd3-geo';
 import LineComponent from '../LineComponent'; 
@@ -7,7 +6,7 @@ import LabelComponent from '../LabelComponent';
 import HNDMarker from '../HNDMarker';
 import Modal from '../Modal';
 import { getImageForRoute } from './getImageForRoute'; 
-import enso from '../../img/enso/enso ver3.png';  
+import enso from '../../img/enso/enso ver3.png';
 import airportNames from './airportNames';
 import MovingImage from '../MovingImage';
 
@@ -23,6 +22,44 @@ interface AustraliaMapProps {
   setTotalLabelSum: (sum: number) => void; // 親から受け取る関数
 }
 
+const airports: Airport[] = [
+  {
+    iata_code: 'AEA',
+    airport_name: 'Abemama Atoll Airport',
+    country_name: 'Kiribati',
+    latitude: 0.4908,
+    longitude: 173.8289
+  },
+  {
+    iata_code: 'ABU',
+    airport_name: 'Haliwen Airport',
+    country_name: 'Indonesia',
+    latitude: -9.3333,
+    longitude: 124.9
+  },
+  {
+    iata_code: 'ACZ',
+    airport_name: 'Zabol Airport',
+    country_name: 'Iran',
+    latitude: 31.0983,
+    longitude: 61.5438
+  },
+  {
+    iata_code: 'ACJ',
+    airport_name: 'Anuradhapura Air Force Base',
+    country_name: 'Sri Lanka',
+    latitude: 8.3014,
+    longitude: 80.4279
+  },
+  {
+    iata_code: 'ADO',
+    airport_name: 'Andamooka Airport',
+    country_name: 'Australia',
+    latitude: -30.4491,
+    longitude: 137.1637
+  }
+];
+
 const geoUrl = "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson";
 
 const safeProjection = (projection: (coords: [number, number]) => [number, number] | null) => {
@@ -36,38 +73,14 @@ const safeProjection = (projection: (coords: [number, number]) => [number, numbe
 };
 
 const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
-  const [airports, setAirports] = useState<Airport[]>([]);
   const [selectedAirports, setSelectedAirports] = useState<string[]>(['HND']); // HNDを初期選択
-  const [availableAirports, setAvailableAirports] = useState<string[]>([]); // クリック可能な空港
+  const [availableAirports, setAvailableAirports] = useState<string[]>(['ACZ', 'ABU', 'AEA']); // クリック可能な空港
   const [selectedConnections, setSelectedConnections] = useState<{from: string, to: string, label: string}[]>([]); // 選択された接続を保存
   const [Goal, setGoal] = useState<boolean>(false); // ゲーム終了フラグ
   const [totalLocalLabelSum, setTotalLocalLabelSum] = useState<number>(0); // ローカルの総ラベルの合計
   const [clickedAirportCoords, setClickedAirportCoords] = useState<[number, number] | null>(null); // 最後にクリックされた空港の座標
   const [currentImageSrc, setCurrentImageSrc] = useState<string>(enso); // 現在表示している画像の状態
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    const fetchAirports = async () => {
-      // https://aviationstack.com/ を使用して空港APIを取得
-      try {
-        const response = await axios.get('https://api.aviationstack.com/v1/airports', {
-          params: {
-            access_key: 'd4c2df5baa3fff5746d798f6577a67bf', //API KEY　ここを変える
-          }
-        });
-
-        console.log(response.data.data); // デバッグのため、取得したデータをコンソールに表示
-        setAirports(response.data.data); // データを状態に保存
-
-        // 初期状態でHNDと接続されている空港をavailableAirportsに追加
-        setAvailableAirports(['ACZ', 'ABU', 'AEA']);
-      } catch (error) {
-        console.error('Error fetching airport data:', error);
-      }
-    };
-
-    fetchAirports();
-  }, []);
 
   const projection = safeProjection(
     geoMercator()
@@ -101,53 +114,39 @@ const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
     longitude: 139.6917
   };
 
-  // フィルタリングされた空港のリストを取得
-  const filteredAirports = airports.filter(airport =>
-    ['ACZ', 'ABU', 'AEA', 'ACJ', 'ADO'].includes(airport.iata_code)
-  );
-
   // 空港をクリックした際の処理
   const handleMarkerClick = (iataCode: string, longitude: number, latitude: number) => {
     if (availableAirports.includes(iataCode) && !Goal) {
-      // 空港を選択済みに追加
       setSelectedAirports((prev) => [...prev, iataCode]);
 
-      // 最後に選択された空港
       const lastSelectedAirport = selectedAirports[selectedAirports.length - 1];
 
-      // 接続情報を取得
       const connection = connections.find(([a1, a2]) => (a1 === lastSelectedAirport && a2 === iataCode) || (a1 === iataCode && a2 === lastSelectedAirport));
 
       if (connection) {
-        // 接続を保存（from, to, label）
         setSelectedConnections((prev) => [...prev, {from: lastSelectedAirport, to: iataCode, label: connection[2]}]);
 
-           // ラベルの合計を計算
-           setTotalLocalLabelSum(prev => {  
-            const newSum = prev + Number(connection[2]);
-            setTotalLabelSum(newSum); // 親コンポーネントに更新を通知
-            return newSum;
-          });
+        setTotalLocalLabelSum(prev => {  
+          const newSum = prev + Number(connection[2]);
+          setTotalLabelSum(newSum); // 親コンポーネントに更新を通知
+          return newSum;
+        });
 
-        // クリックした空港の座標を保存し、ピクセル座標に変換
         const pixelCoords = projection([longitude, latitude]);
         if (pixelCoords) {
           setClickedAirportCoords(pixelCoords);
         }
 
-         // 経路に基づいて画像を切り替える(getImageForRoute.tsで指定)
-         setCurrentImageSrc(getImageForRoute(lastSelectedAirport, iataCode));
-        }
+        setCurrentImageSrc(getImageForRoute(lastSelectedAirport, iataCode));
+      }
 
-      // 新たにクリック可能な空港を計算
       const nextAirports = connections
-        .filter(([a1, a2]) => a1 === iataCode || a2 === iataCode) // クリックされた空港と繋がる空港を探す
-        .map(([a1, a2]) => (a1 === iataCode ? a2 : a1)) // 繋がる空港をリストアップ
-        .filter((airport) => !selectedAirports.includes(airport)); // 未選択の空港のみ追加
+        .filter(([a1, a2]) => a1 === iataCode || a2 === iataCode)
+        .map(([a1, a2]) => (a1 === iataCode ? a2 : a1))
+        .filter((airport) => !selectedAirports.includes(airport));
 
-      setAvailableAirports(nextAirports); // 次のクリック可能な空港に設定
+      setAvailableAirports(nextAirports);
 
-      // ゴールの ADO に到達した場合、ゲーム終了
       if (iataCode === 'ADO') {
         setGoal(true);
         setIsModalOpen(true); 
@@ -155,16 +154,15 @@ const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
     }
   };
 
-   // リセット処理を定義
-   const handleReset = () => {
-    setSelectedAirports(['HND']); // 初期状態に戻す（HNDのみ選択）
-    setSelectedConnections([]);   // 選択された接続をリセット
-    setAvailableAirports(['ACZ', 'ABU', 'AEA']); // 初期状態に戻す
-    setTotalLabelSum(0);  // 総ラベルをリセット
-    setGoal(false);  // ゲーム終了フラグをリセット
-    setIsModalOpen(false);  // モーダルを閉じる
-    setCurrentImageSrc(enso); // 画像を初期状態に戻す
-    setTotalLocalLabelSum(0); // リセット時に親にも通知
+  const handleReset = () => {
+    setSelectedAirports(['HND']);
+    setSelectedConnections([]);
+    setAvailableAirports(['ACZ', 'ABU', 'AEA']);
+    setTotalLabelSum(0);
+    setGoal(false);
+    setIsModalOpen(false);
+    setCurrentImageSrc(enso);
+    setTotalLocalLabelSum(0);
   };
 
   const renderLines = () => {
@@ -172,10 +170,9 @@ const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
       const airport1 = a1 === 'HND' ? hndAirport : airports.find(airport => airport.iata_code === a1);
       const airport2 = a2 === 'HND' ? hndAirport : airports.find(airport => airport.iata_code === a2);
       if (airport1 && airport2) {
-                // この接続が選択されているかどうかを判定
-                const isSelectedConnection = selectedConnections.some(
-                  connection => (connection.from === a1 && connection.to === a2) || (connection.from === a2 && connection.to === a1)
-                );
+        const isSelectedConnection = selectedConnections.some(
+          connection => (connection.from === a1 && connection.to === a2) || (connection.from === a2 && connection.to === a1)
+        );
         const [x1, y1] = getAdjustedCoords([airport1.longitude, airport1.latitude], projection);
         const [x2, y2] = getAdjustedCoords([airport2.longitude, airport2.latitude], projection);
         
@@ -186,8 +183,8 @@ const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
             y1={y1}
             x2={x2}
             y2={y2}
-            color={isSelectedConnection ? "#0000FF" : "#FF0000"} // 選択されたら青色、それ以外は赤色
-            strokeDasharray={isSelectedConnection ? "0" : "4 2"} // 選択されたら実線、それ以外は点線
+            color={isSelectedConnection ? "#0000FF" : "#FF0000"} 
+            strokeDasharray={isSelectedConnection ? "0" : "4 2"} 
           />
         );
       }
@@ -210,7 +207,7 @@ const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
             x={mx}
             y={my}
             label={label}
-            labelColor="#0000FF" // customize as needed
+            labelColor="#0000FF"
             labelSize="1.5em"
           />
         );
@@ -260,10 +257,8 @@ const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
           }
         </Geographies>
 
-        {/* 空港間の線を描画 */}
         {renderLines()}
 
-        {/* 羽田空港のマーカーを表示 */}
         <HNDMarker
           longitude={hndAirport.longitude}
           latitude={hndAirport.latitude}
@@ -271,8 +266,7 @@ const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
           handleMarkerClick={() => handleMarkerClick(hndAirport.iata_code, hndAirport.longitude, hndAirport.latitude)}
         />
 
-        {/* フィルタリングされた空港の赤丸 */}
-        {filteredAirports.map((airport) => (
+        {airports.map((airport) => (
           <Marker
             key={airport.iata_code}
             coordinates={[airport.longitude, airport.latitude]}
@@ -282,14 +276,14 @@ const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
               fill={
                 airport.iata_code === 'ADO' 
                 ? selectedAirports.includes(airport.iata_code) 
-                  ? "#0000FF"  // ADOが選択されたら青色
-                  : "#FFA500"  // ADOが未選択ならオレンジ色
+                  ? "#0000FF"
+                  : "#FFA500"
                 : selectedAirports.includes(airport.iata_code) 
-                ? "#0000FF"  // 他の空港が選択されたら青色
-                : "#FF0000"  // 他の空港が未選択なら赤色
+                ? "#0000FF"
+                : "#FF0000"
               }
-              onClick={() => handleMarkerClick(airport.iata_code, airport.longitude, airport.latitude)} // クリックイベントを追加
-              style={{ cursor: availableAirports.includes(airport.iata_code) ? "pointer" : "not-allowed" }} // クリック可能かどうか
+              onClick={() => handleMarkerClick(airport.iata_code, airport.longitude, airport.latitude)}
+              style={{ cursor: availableAirports.includes(airport.iata_code) ? "pointer" : "not-allowed" }}
             />
             <text
               textAnchor="middle"
@@ -301,15 +295,13 @@ const AustraliaMap: React.FC<AustraliaMapProps> = ({ setTotalLabelSum }) => {
           </Marker>
         ))}
 
-        {/* ラベルを描画 */}
-{renderLabels()}
-      
-      {/* ensoの移動 */}
-<MovingImage 
-        imageSrc={currentImageSrc} 
-        clickedAirportCoords={clickedAirportCoords} 
-        projection={projection} 
-      />
+        {renderLabels()}
+
+        <MovingImage 
+          imageSrc={currentImageSrc} 
+          clickedAirportCoords={clickedAirportCoords} 
+          projection={projection} 
+        />
       </ComposableMap>
 
       <Modal isOpen={isModalOpen} onClose={handleReset} totalLabelSum={totalLocalLabelSum} isWinner={totalLocalLabelSum === 11} />

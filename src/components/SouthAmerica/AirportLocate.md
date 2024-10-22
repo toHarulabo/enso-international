@@ -20,11 +20,11 @@
   longitude: -145.5090
 },
 {
-  iata_code: 'CAN',
-  airport_name: 'Guangzhou Baiyun International Airport',
-  country_name: 'China',
-  latitude: 23.3924,
-  longitude: 113.2988
+  iata_code: 'ACN',
+  airport_name: 'Ciudad Acuña International Airport',
+  country_name: 'Mexico',
+  latitude: 29.3329,
+  longitude: -101.0989
 },
 {
   iata_code: 'AEP',
